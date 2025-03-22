@@ -1,0 +1,15 @@
+html, body, #map {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: white;
+}
+
+.leaflet-popup-content {
+  width: auto !important;
+}
+
+.border-us-ca {
+  stroke-width: 2px;
+  stroke: #000;
+}
