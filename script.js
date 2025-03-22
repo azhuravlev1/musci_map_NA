@@ -1,53 +1,30 @@
-const map = L.map('map').setView([50, -100], 3);
+// initialize Leaflet map
+const map = L.map('map').setView([55, -100], 3);
 
-// Set minimalist white tiles (or no tiles at all)
-L.tileLayer('', {
-  attribution: ''
+// Add OpenStreetMap tiles temporarily for debugging
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// Load your GeoJSON data
-fetch('data/north-america.geojson')
-  .then(response => response.json())
+// Fetch and load GeoJSON data
+fetch('data/us_canada.geojson')
+  .then(res => res.json())
   .then(data => {
     L.geoJson(data, {
-      style: feature => ({
+      style: {
         color: '#000',
-        weight: feature.properties.ADMIN === 'Canada' || feature.properties.ADMIN === 'United States of America' ? 2 : 1,
+        weight: 1,
         fillColor: '#fff',
-        fillOpacity: 0.7
-      }),
+        fillOpacity: 0.5
+      },
       onEachFeature: (feature, layer) => {
         layer.on('click', () => {
-          showSpotifyPopup(layer, feature);
+          alert(`You clicked on: ${feature.properties.name}`);
         });
       }
     }).addTo(map);
+  })
+  .catch(err => {
+    console.error('GeoJSON error:', err);
+    alert('Failed to load GeoJSON data. Check console.');
   });
-
-// Function to show Spotify Popup
-function showSpotifyPopup(layer, feature) {
-  const regionName = feature.properties.NAME || feature.properties.name;
-
-  // You can use an object or file to easily update playlists later
-  const spotifyUrls = {
-    'Ontario': 'YOUR_SPOTIFY_URL_FOR_ONTARIO',
-    'California': 'YOUR_SPOTIFY_URL_FOR_CALIFORNIA',
-    // ... more regions
-  };
-
-  const spotifyUrl = spotifyUrls[regionName];
-
-  if (spotifyUrl) {
-    const embedHtml = `
-      <iframe style="border-radius:12px" 
-              src="${spotifyUrl}" 
-              width="300" height="152" frameBorder="0" 
-              allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
-      </iframe>
-    `;
-
-    layer.bindPopup(embedHtml).openPopup();
-  } else {
-    layer.bindPopup(`No playlist for ${regionName} yet!`).openPopup();
-  }
-}
