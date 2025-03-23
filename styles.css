@@ -20,7 +20,7 @@ html, body {
 }
 
 .label-no-playlist {
-  color: lightgrey;
+  color: transparent;
 }
 
 .label-has-playlist {
