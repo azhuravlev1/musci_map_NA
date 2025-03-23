@@ -8,3 +8,22 @@ html, body {
   width: 100%;
   background: white; /* ensures a white background */
 }
+
+/* Tooltip styles */
+.leaflet-tooltip {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 10px;
+  font-weight: normal;
+  pointer-events: none;
+}
+
+.label-no-playlist {
+  color: lightgrey;
+}
+
+.label-has-playlist {
+  color: blue;
+  font-weight: bold;
+}
