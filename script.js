@@ -15,11 +15,48 @@ const hoverStyle = {
   fillOpacity: 0.3
 };
 
-const selectedStyle = {
+const selectedStyleCanada = {
+  color: "#000",
+  weight: 2,
+  fillColor: "#e60026", // deeper red
+  fillOpacity: 0.6
+};
+
+const selectedStyleUSA = {
   color: "#000",
   weight: 2,
   fillColor: "blue",
-  fillOpacity: 0.5
+  fillOpacity: 0.6
+};
+
+const selectedStyleDefault = {
+  color: "#000",
+  weight: 2,
+  fillColor: "#999", // neutral gray
+  fillOpacity: 0.6
+};
+
+
+
+const hoverStyleCanada = {
+  fillColor: "#ffcccc",  // light red
+  fillOpacity: 0.4,
+  color: "#000",
+  weight: 1
+};
+
+const hoverStyleUSA = {
+  fillColor: "#cce5ff",  // light blue
+  fillOpacity: 0.4,
+  color: "#000",
+  weight: 1
+};
+
+const hoverStyleDefault = {
+  fillColor: "#e6e6e6",  // neutral grey for other countries
+  fillOpacity: 0.4,
+  color: "#000",
+  weight: 1
 };
 
 // Load the Spotify playlist mapping first
@@ -45,17 +82,29 @@ fetch('playlists/spotifyPlaylists.json')
 
 function onEachFeature(feature, layer) {
   const regionName = feature.properties.name || feature.properties.NAME;
+  const adminCountry = feature.properties.admin || feature.properties.ADMIN;
   const hasPlaylist = !!spotifyPlaylists[regionName];
-
-  layer.selected = false;
-
-  // Permanent label (tooltip)
+  
+  let labelClass = 'label-no-playlist';
+  if (hasPlaylist && adminCountry === "Canada") {
+    labelClass = 'label-has-playlist-canada';
+  } else if (hasPlaylist && adminCountry === "United States of America") {
+    labelClass = 'label-has-playlist-usa';
+  }
+  
   layer.bindTooltip(regionName, {
     permanent: true,
     direction: 'center',
-    className: hasPlaylist ? 'label-has-playlist' : 'label-no-playlist'
+    className: labelClass
   });
-  console.log(regionName, "hasPlaylist:", hasPlaylist);
+
+  layer.selected = false;
+
+  // console.log(regionName, "hasPlaylist:", hasPlaylist);
+  // console.log(
+  //   "Region:", feature.properties.name || feature.properties.NAME,
+  //   "| Country Field:", feature.properties.admin || feature.properties.ADMIN
+  // );
 
 
   // Hover + Click
@@ -68,8 +117,16 @@ function onEachFeature(feature, layer) {
 
 function highlightFeature(e) {
   const layer = e.target;
-  if (!layer.selected) {
-    layer.setStyle(hoverStyle);
+  if (layer.selected) return;
+
+  const adminCountry = layer.feature.properties.admin || layer.feature.properties.ADMIN;
+
+  if (adminCountry === "Canada") {
+    layer.setStyle(hoverStyleCanada);
+  } else if (adminCountry === "United States of America") {
+    layer.setStyle(hoverStyleUSA);
+  } else {
+    layer.setStyle(hoverStyleDefault);
   }
 }
 
@@ -83,6 +140,7 @@ function resetHighlight(e) {
 function onFeatureClick(e) {
   const layer = e.target;
   const regionName = layer.feature.properties.name || layer.feature.properties.NAME;
+  const adminCountry = layer.feature.properties.admin || layer.feature.properties.ADMIN;
 
   if (selectedLayer && selectedLayer !== layer) {
     selectedLayer.setStyle(defaultStyle);
@@ -92,7 +150,14 @@ function onFeatureClick(e) {
 
   if (!layer.selected) {
     layer.selected = true;
-    layer.setStyle(selectedStyle);
+    if (adminCountry === "Canada") {
+      layer.setStyle(selectedStyleCanada);
+    } else if (adminCountry === "United States of America") {
+      layer.setStyle(selectedStyleUSA);
+    } else {
+      layer.setStyle(selectedStyleDefault);
+    }
+
     selectedLayer = layer;
 
     const embedUrl = spotifyPlaylists[regionName] || "";

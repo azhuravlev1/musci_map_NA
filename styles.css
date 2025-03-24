@@ -23,7 +23,15 @@ html, body {
   color: transparent;
 }
 
-.label-has-playlist {
-  color: blue;
+
+/* Canada + has playlist */
+.label-has-playlist-canada {
+  color: red;
+  font-weight: bold;
+}
+
+/* USA + has playlist */
+.label-has-playlist-usa {
+  color: darkblue;
   font-weight: bold;
 }
